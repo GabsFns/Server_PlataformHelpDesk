@@ -6,34 +6,141 @@
 
 generator client {
   provider = "prisma-client-js"
-  output   = "../src/generated/prisma"
+
 }
 
 datasource db {
   provider = "postgresql"
   url      = env("DATABASE_URL")
 }
-model Loja {
-  id       Int       @id @default(autoincrement())
-  nome     String
-  chamados Chamado[]
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+enum TipoUsuario {
+  ADMIN
+  LOJA
+  SETOR
+}
+
+model Usuario {
+  idUsuario Int      @id @default(autoincrement())
+  email     String   @unique
+  senha     String
+  tipo      TipoUsuario
+  lojaId    Int?
+  setorId   Int?
+
+  loja      Loja?    @relation(fields: [lojaId], references: [idLoja])
+  setor     Setor?   @relation(fields: [setorId], references: [idSetor])
+  
+  criadoEm DateTime @default(now())
 }
 
 model Setor {
-  id       Int       @id @default(autoincrement())
-  nome     String
-  chamados Chamado[]
+  idSetor   Int     @id @default(autoincrement())
+  nome      String
+  codigo    String
+  tokenId   Int
+
+  token     Token   @relation(fields: [tokenId], references: [idToken])
+  chamados  Chamado[]
+  respostas RespostaChamado[]
+  historicos HistoricoChamado[] 
+
+  usuarios  Usuario[] 
+}
+
+model Loja {
+  idLoja    Int     @id @default(autoincrement())
+  nome      String
+  cnpj      String
+  tokenId   Int
+
+  token     Token   @relation(fields: [tokenId], references: [idToken])
+  chamados  Chamado[]
+  respostas RespostaChamado[]
+  historicos HistoricoChamado[] 
+
+  usuarios  Usuario[] 
+}
+
+model Token {
+  idToken    Int      @id @default(autoincrement())
+  token      String
+  createdAt  DateTime @default(now())
+
+  setor              Setor[]
+  loja               Loja[]
+  chamado            Chamado[]
+  respostasChamado   RespostaChamado[]
+  historicosChamado  HistoricoChamado[] 
 }
 
 model Chamado {
-  id         Int      @id @default(autoincrement())
-  titulo     String
-  descricao  String
-  status     String   @default("aberto")
-  criadoEm   DateTime @default(now())
+  idChamado    Int      @id @default(autoincrement())
+  titulo       String
+  descricao    String
+  tipo         String
+  status       String
+  prioridade   String
+  dataCriacao  DateTime @default(now())
+  dataConclusao DateTime
+
+  lojaId       Int
+  setorId      Int
+  tokenId      Int
+
+  loja         Loja     @relation(fields: [lojaId], references: [idLoja])
+  setor        Setor    @relation(fields: [setorId], references: [idSetor])
+  token        Token    @relation(fields: [tokenId], references: [idToken])
+
+  anexos       Anexo[]
+  respostas    RespostaChamado[]
+  historicos   HistoricoChamado[]
+}
+
+model Anexo {
+  idAnexo    Int      @id @default(autoincrement())
+  arquivo    String
+  chamadoId  Int
   lojaId     Int
   setorId    Int
+  tokenId    Int
 
-  loja       Loja     @relation(fields: [lojaId], references: [id])
-  setor      Setor    @relation(fields: [setorId], references: [id])
+  chamado    Chamado  @relation(fields: [chamadoId], references: [idChamado])
+}
+
+model RespostaChamado {
+  idRespostaChamado  Int  @id @default(autoincrement())
+  mensagem           String
+  responsavel        String
+  dataResposta       DateTime
+
+  chamadoId          Int
+  lojaId             Int
+  setorId            Int
+  tokenId            Int
+
+  chamado            Chamado @relation(fields: [chamadoId], references: [idChamado])
+  loja               Loja    @relation(fields: [lojaId], references: [idLoja])
+  setor              Setor   @relation(fields: [setorId], references: [idSetor])
+  token              Token   @relation(fields: [tokenId], references: [idToken])
+
+  historicos         HistoricoChamado[]
+}
+
+model HistoricoChamado {
+  idHistoricoChamado  Int  @id @default(autoincrement())
+
+  respostaChamadoId   Int
+  chamadoId           Int
+  lojaId              Int
+  setorId             Int
+  tokenId             Int
+
+  respostaChamado     RespostaChamado @relation(fields: [respostaChamadoId], references: [idRespostaChamado])
+  chamado             Chamado         @relation(fields: [chamadoId], references: [idChamado])
+  loja                Loja            @relation(fields: [lojaId], references: [idLoja])
+  setor               Setor           @relation(fields: [setorId], references: [idSetor])
+  token               Token           @relation(fields: [tokenId], references: [idToken])
 }
