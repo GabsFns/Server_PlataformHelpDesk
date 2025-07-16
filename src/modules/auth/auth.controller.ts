@@ -30,6 +30,7 @@ export async function logoutController(req: any, rep: any) {
         return rep.status(500).send({ error: "Internal Server Error" });
     }
 }
+
 export async function createTokenController(req: FastifyRequest, rep: FastifyReply) {
   console.log("Creating token...");
   try {

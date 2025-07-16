@@ -54,7 +54,7 @@ export async function createToken(fastify: FastifyInstance) {
       },
     });
 
-    console.log('Retorno da criação do token:', result); // 💥 este log é fundamental
+    console.log('Retorno da criação do token:', result); 
 
     console.log(`Token criado no banco: ${result.token}`);
     return result;
