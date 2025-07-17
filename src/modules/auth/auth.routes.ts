@@ -1,6 +1,6 @@
 import { FastifyInstance } from 'fastify';
 import { registerController, loginController, logoutController, createTokenController } from './auth.controller';
-import { cadastroSchema, loginSchema } from './auth.schema';
+import { cadastroSchema, loginSchema, logoutSchema } from './auth.schema';
 import { authGuard, authRedisToken } from '../../middlewares/authGuard';
 
 export async function authRoutes(fastify: FastifyInstance) {
@@ -16,7 +16,8 @@ export async function authRoutes(fastify: FastifyInstance) {
 
     fastify.get('/api/v1/auth/logout', {
         preHandler: authRedisToken,
-        handler: logoutController
+        handler: logoutController,
+        schema: logoutSchema,
     });
 
     fastify.post('/api/v1/auth/token', createTokenController);

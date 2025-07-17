@@ -23,7 +23,7 @@ export async function createChamado(fastify: FastifyInstance, data: CreateChamad
     });
     
     await enviarChamadoParaFila(chamado);
-    const routingKey = chamado.setor.nome.toLowerCase();
+    const routingKey = chamado.setor.nome.toUpperCase();
     io.to(routingKey).emit('novoChamado', chamado);
     
      return chamado;

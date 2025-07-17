@@ -2,7 +2,7 @@ import { FastifyRequest, FastifyReply } from "fastify";
 import { createChamado } from "./store.service";
 import { createChamadoSchema } from "./store.schema";
 import { ZodError } from "zod";
-export async function registerChamado(req: FastifyRequest, rep: FastifyReply) {
+export async function registerChamadoController(req: FastifyRequest, rep: FastifyReply) {
   try {
     const parsed = createChamadoSchema.parse(req.body);
     const chamado = await createChamado(req.server, parsed);
