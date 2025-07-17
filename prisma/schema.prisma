@@ -85,7 +85,7 @@ model Chamado {
   prioridade   String
   dataCriacao  DateTime @default(now())
   dataConclusao DateTime
-
+  
   lojaId       Int
   setorId      Int
   tokenId      Int

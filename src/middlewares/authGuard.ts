@@ -15,6 +15,13 @@ export async function authGuard(
   }
 }
 
+export async function verifyLojaRole(req: FastifyRequest, rep: FastifyReply) {
+  const user = req.user as { tipo?: string };
+
+  if (!user?.tipo || user.tipo.toUpperCase() !== "LOJA") {
+    return rep.status(403).send({ error: "Acesso negado: somente usuários LOJA" });
+  }
+}
 
 export async function authRedisToken(
   req: FastifyRequest,

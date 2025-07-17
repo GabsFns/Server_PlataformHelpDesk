@@ -20,6 +20,8 @@ export async function registerUser(fastify: FastifyInstance, dados: any) {
 export async function authenticateUser(fastify: FastifyInstance, dados: any) {
     const {email, senha} = dados;
 
+    try {
+    
     const user = await fastify.prisma.usuario.findUnique({where: { email },});
     if (!user) throw new Error('Usuário não encontrado');
 
@@ -34,8 +36,12 @@ export async function authenticateUser(fastify: FastifyInstance, dados: any) {
         setorId: user.setorId
     });
     await fastify.redis.set(`token:${user.id}`, token, 'EX', 3600);
-
     return { token };
+  } catch (error) {
+    console.error('Erro ao autenticar usuário:', error);
+  }
+    return { error: "Erro" };
+    
 };
 
 export async function logoutUser(fastify: FastifyInstance, userId: string) {
@@ -46,19 +52,15 @@ export async function logoutUser(fastify: FastifyInstance, userId: string) {
 export async function createToken(fastify: FastifyInstance) {
   const generatedToken = uuidv4();
   console.log(`Generated Token: ${generatedToken}`);
-
   try {
     const result = await fastify.prisma.token.create({
       data: {
         token: generatedToken,
       },
     });
-
     console.log('Retorno da criação do token:', result); 
-
     console.log(`Token criado no banco: ${result.token}`);
     return result;
-
   } catch (error) {
     console.error('Erro ao criar token no banco:', error);
     throw error;

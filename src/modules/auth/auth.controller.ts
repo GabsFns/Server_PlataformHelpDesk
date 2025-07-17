@@ -1,8 +1,7 @@
 import { registerUser, authenticateUser, createToken } from "./auth.service";
-import { FastifyInstance } from 'fastify';
 import { FastifyRequest, FastifyReply } from 'fastify';
 
-export async function registerController(req: any, rep: any) {
+export async function registerController(req: FastifyRequest, rep: FastifyReply) {
     try{
         const user = await registerUser(req.server, req.body);
         return rep.status(201).send(user); 
@@ -11,7 +10,7 @@ export async function registerController(req: any, rep: any) {
 
 }}
 
-export async function loginController(req: any, rep: any) {
+export async function loginController(req: FastifyRequest, rep: FastifyReply) {
     try{
         const result = await authenticateUser(req.server, req.body);
         return rep.status(200).send(result);
@@ -23,8 +22,8 @@ export async function loginController(req: any, rep: any) {
 
 export async function logoutController(req: any, rep: any) {
     try {
-        const userId = req.user.id; // Assuming user ID is stored in req.user after authGuard
-        const result = await req.server.logoutUser(userId);
+        const userId = req.user.id;
+        const result = await req.server.logoutUser( req.server, userId);
         return rep.status(200).send(result);
     } catch (error) {
         return rep.status(500).send({ error: "Internal Server Error" });

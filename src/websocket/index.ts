@@ -11,8 +11,31 @@ export const io = new Server(httpServer, {
 });
 
 io.on('connection', (socket) => {
-  console.log(`Cliente conectado: ${socket.id}`);
+  let user;
+  try {
+    user = JSON.parse(socket.handshake.query.user as string);
+  } catch (error) {
+    console.error('Erro ao fazer parse do usuário');
+    socket.disconnect();
+    return;
+  }
+
+  if (!user) {
+    console.error('Usuário não fornecido na conexão do socket');
+    socket.disconnect();
+    return;
+  }
+
+  if (user.tipo === 'LOJA' && user.lojaId) {
+    socket.join(`loja:${user.lojaId}`);
+    console.log(`Usuário LOJA conectado: ${user.lojaId}`);
+  } else if (user.tipo === 'SETOR' && user.setorId) {
+    socket.join(`setor:${user.setorId}`);
+    console.log(`Usuário SETOR conectado: ${user.setorId}`);
+  }
+
   registerSocketEvents(socket);
+
 });
 
 export { app, httpServer }
