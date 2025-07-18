@@ -12,6 +12,15 @@ const swaggerOptions = {
     ],
     consumes: ['application/json'],
     produces: ['application/json'],
+    components: {
+      securitySchemes: {
+        bearerAuth: {
+          type: 'http',
+          scheme: 'bearer',
+          bearerFormat: 'JWT',
+        },
+      },
+    },
   },
   exposeRoute: true,
 };

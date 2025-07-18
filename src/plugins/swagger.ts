@@ -4,8 +4,8 @@ import fastifySwaggerUi from '@fastify/swagger-ui';
 import swaggerConfig from '../config/swagger.config';
 
 export async function swaggerPlugin(fastify: FastifyInstance) {
+  
   await fastify.register(fastifySwagger, swaggerConfig);
-
   await fastify.register(fastifySwaggerUi, {
     routePrefix: '/docs',
     staticCSP: true,

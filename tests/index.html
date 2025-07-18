@@ -1,0 +1,39 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8" />
+  <title>Teste Socket.IO</title>
+  <script src="https://cdn.socket.io/4.7.2/socket.io.min.js"></script>
+</head>
+<body>
+  <h1>Teste de conexão com WebSocket</h1>
+  <p id="status">Conectando...</p>
+
+ <script>
+  const user = {
+    tipo: 'SETOR', // ou 'LOJA'
+    setorId: '1' // ID do setor do usuário conectado
+  };
+
+  const socket = io('http://localhost:3001', {
+    query: { user: JSON.stringify(user) }
+  });
+
+  socket.on('connect', () => {
+    document.getElementById('status').innerText = '✅ Conectado com sucesso!';
+    console.log('Conectado ao servidor Socket.IO');
+
+    // Entrar na sala do setor - o nome da sala precisa ser o mesmo usado no backend:
+    socket.emit('joinRoom', 'TI');  // Troque 'TI' pelo nome do setor real em maiúsculo
+  });
+
+  socket.on('disconnect', () => {
+    document.getElementById('status').innerText = '❌ Desconectado do servidor';
+  });
+
+  socket.on('novoChamado', (data) => {
+    console.log('Novo chamado recebido:', data);
+  });
+</script>
+</body>
+</html>

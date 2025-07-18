@@ -95,3 +95,32 @@ export const logoutSchema = {
 };
 
 
+export const createTokenSchema = {
+  tags: ['Auth'], // Certifique-se de que a tag 'Auth' está definida em swagger.config.ts
+  summary: 'Criar novo token de acesso',
+  description: 'Gera um novo token JWT para um usuário autenticado, usando um token de refresh ou credenciais.',
+  // Adapte o 'body' e 'response' conforme a sua lógica de createTokenController
+  body: {
+    type: 'object',
+    properties: {
+      refreshToken: { type: 'string', description: 'Token de refresh para gerar um novo token de acesso' },
+     
+    },
+  },
+  response: {
+    200: {
+      description: 'Novo token gerado com sucesso',
+      type: 'object',
+      properties: {
+        token: { type: 'string', description: 'Novo token de acesso JWT' },
+      },
+    },
+    401: {
+      description: 'Não autorizado ou token de refresh inválido',
+      type: 'object',
+      properties: {
+        message: { type: 'string' },
+      },
+    },
+  },
+};

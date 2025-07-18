@@ -5,16 +5,21 @@ import { v4 as uuidv4 } from 'uuid';
 export async function registerUser(fastify: FastifyInstance, dados: any) {
     const { email, senha, tipo, lojaId, setorId} = dados
     const hashedPassword = await hashPassword(senha);
-    const user = await fastify.prisma.usuario.create({
-        data: {
-            email,
-            senha: hashedPassword,
-            tipo,
-            lojaId: tipo === 'LOJA' ? lojaId : null,
-            setorId: tipo === 'SETOR' ? setorId : null,
-        },
-    })
-    return user;
+   try {
+  const user = await fastify.prisma.usuario.create({
+    data: {
+      email,
+      senha: hashedPassword,
+      tipo,
+      lojaId: tipo === 'LOJA' ? lojaId : null,
+      setorId: tipo === 'SETOR' ? setorId : null,
+    },
+  });
+  return user;
+} catch (error) {
+  console.error('Erro ao criar usuário:', error);
+
+};
 };
 
 export async function authenticateUser(fastify: FastifyInstance, dados: any) {

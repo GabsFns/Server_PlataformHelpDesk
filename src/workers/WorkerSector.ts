@@ -19,7 +19,7 @@ async function startGenericWorker() {
                 const chamado = JSON.parse(msg.content.toString());
                 console.log(`Chamado recebido na fila ${setor}: ${JSON.stringify(chamado)}`);
 
-                io.to(`setor:${chamado.setorId}`).emit(`novoChamado${setor.toUpperCase()}`, chamado);
+                io.to(setor.toUpperCase()).emit('novoChamado', chamado);
 
                 channel.ack(msg);
             }
