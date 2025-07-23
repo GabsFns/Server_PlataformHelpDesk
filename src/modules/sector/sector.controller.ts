@@ -1,5 +1,5 @@
 import { FastifyRequest, FastifyReply} from "fastify";
-import { createRespostaSchema } from "./sector.schema";
+import { CreateRespostaSchema, createRespostaSchema } from "./sector.schema";
 import { responseChamado } from "./sector.service";
 import { ZodError } from "zod";
 
@@ -7,7 +7,7 @@ interface Params {
     id: string;
 }
 
-export async function responseChamadaController(req: FastifyRequest<{Params: Params}>, rep: FastifyReply) {
+export async function responseChamadaController(req: FastifyRequest<{Params: Params, Body: CreateRespostaSchema}>, rep: FastifyReply) {
     try {
         const chamadoId = Number(req.params['id']);
         const parsed = createRespostaSchema.parse({ ...req.body, chamadoId });

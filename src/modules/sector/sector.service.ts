@@ -4,19 +4,20 @@ import { enviarRespostaParaFila } from "@/services/rabbitmqService";
 import { io } from "../../websocket/index";
 
 export async function responseChamado(fastify: FastifyInstance, data: CreateRespostaSchema) {
-    const chamado = await fastify.prisma.chamado.findUnique({
+   const resposta = await fastify.prisma.$transaction(async (tx: any) => {
+
+     const chamado = await tx.chamado.findUnique({
         where: { id: data.chamadoId },
         include: {
             loja: true,
             setor: true,
         },
     });
-    
     if (!chamado) {
         throw new Error("Chamado não encontrado");
     }
 
-    const resposta = await fastify.prisma.respostaChamado.create({
+    const resposta = await tx.respostaChamado.create({
         data: {
             mensagem: data.mensagem,
             chamadoId: chamado.chamadoId,
@@ -35,11 +36,28 @@ export async function responseChamado(fastify: FastifyInstance, data: CreateResp
         },
     });
 
+     await fastify.prisma.chamado.update({
+        where: { id: chamado.id },
+        data: {
+            status: "FINALIZADO",
+            
+        },
+    });
+
+    await tx.historicoChamado.create({
+        data: {
+            respostaChamadoId: resposta.idRespostaChamado,
+            chamadoId: chamado.idChamado,
+            lojaId: chamado.lojaId,
+            setorId: chamado.setorId,
+            tokenId: chamado.tokenId,
+        },
+    });
+   });
+   
     await enviarRespostaParaFila(resposta);
     const routingKey = resposta.chamado.loja.nome.toUpperCase();
     io.to(routingKey).emit('novaResposta', resposta);
-
-    
 
     return resposta;
 }

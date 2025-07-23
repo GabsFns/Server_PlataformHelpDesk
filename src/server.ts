@@ -27,7 +27,7 @@ const startServer = async () => {
  
   
 
-  app.listen({ port: 3000 }, (err, address) => {
+  app.listen({ port: 3005 }, (err, address) => {
     if (err) {
       console.error(err);
       process.exit(1);
