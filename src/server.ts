@@ -9,11 +9,14 @@ import { authRoutes } from "./modules/auth/auth.routes";
 import { connectionRabbitMQ } from "./config/rabbitmq";
 import { socketPlugin } from "./websocket/index";
 const app = fastify();
-
-
+const fastifyMetrics = require('fastify-metrics');
 
 const startServer = async () => {
   
+  app.register(fastifyMetrics, {
+  endpoint: '/metrics', // expõe em localhost:3000/metrics
+  })
+
   await app.register(jwtPlugin)
   await app.register(connectionRabbitMQ);
   await app.register(redisPlugin);

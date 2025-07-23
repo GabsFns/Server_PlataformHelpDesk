@@ -4,12 +4,24 @@ import { enviarRespostaParaFila } from "@/services/rabbitmqService";
 import { io } from "../../websocket/index";
 
 export async function responseChamado(fastify: FastifyInstance, data: CreateRespostaSchema) {
+    const chamado = await fastify.prisma.chamado.findUnique({
+        where: { id: data.chamadoId },
+        include: {
+            loja: true,
+            setor: true,
+        },
+    });
+    
+    if (!chamado) {
+        throw new Error("Chamado não encontrado");
+    }
+
     const resposta = await fastify.prisma.respostaChamado.create({
         data: {
             mensagem: data.mensagem,
-            chamadoId: data.chamadoId,
-            lojaId: data.lojaId,
-            setorId: data.setorId,
+            chamadoId: chamado.chamadoId,
+            lojaId: chamado.lojaId,
+            setorId: chamado.setorId,
             responsavel: data.responsavel,
             dataResposta: data.dataResposta ? new Date(data.dataResposta) : new Date(),
         },
