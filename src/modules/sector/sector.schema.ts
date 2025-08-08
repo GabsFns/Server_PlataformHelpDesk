@@ -7,7 +7,6 @@ export const historicoChamadoSchema = z.object({
       chamadoId: z.number().int().positive("ID do chamado deve ser um número positivo"),
       lojaId: z.number().int().positive("ID da loja deve ser um número positivo"),
       setorId: z.number().int().positive("ID do setor deve ser um número positivo"),
-      tokenId: z.number().int().positive("ID do token deve ser um número positivo"),
 
 })
 
@@ -21,3 +20,4 @@ export const createRespostaSchema = z.object({
 })
 
 export type CreateRespostaSchema = z.infer<typeof createRespostaSchema>;
+export type historicoChamadoSchema = z.infer<typeof historicoChamadoSchema>;

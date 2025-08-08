@@ -1,8 +1,9 @@
 import { FastifyRequest, FastifyReply, FastifyInstance } from "fastify";
-import { CreateRespostaSchema } from "./sector.schema";
+import { CreateRespostaSchema, historicoChamadoSchema } from "./sector.schema";
 import { enviarRespostaParaFila } from "@/services/rabbitmqService";
 import { io } from "../../websocket/index";
 import { stat } from "fs";
+import { includes } from "zod";
 
 export async function responseChamado(fastify: FastifyInstance, data: CreateRespostaSchema) {
    const resposta = await fastify.prisma.$transaction(async (tx: any) => {
@@ -45,7 +46,7 @@ export async function responseChamado(fastify: FastifyInstance, data: CreateResp
         },
     });
 
-    await tx.historicoChamado.create({
+    /*await tx.historicoChamado.create({
         data: {
             respostaChamadoId: resposta.idRespostaChamado,
             chamadoId: chamado.idChamado,
@@ -54,6 +55,7 @@ export async function responseChamado(fastify: FastifyInstance, data: CreateResp
             tokenId: chamado.tokenId,
         },
     });
+    */
    });
    
     await enviarRespostaParaFila(resposta);
@@ -61,6 +63,35 @@ export async function responseChamado(fastify: FastifyInstance, data: CreateResp
     io.to(routingKey).emit('novaResposta', resposta);
 
     return resposta;
+}
+
+// Pensar no fluxo se vai ser um JOB ou nao, levar criterio de perfomance e baos praticas
+export async function InsirirNoHistorico(fastify: FastifyInstance, data: historicoChamadoSchema) {
+    const chamado = await fastify.prisma.chamado.findUnique({
+        where: { id: data.chamadoId },
+        includes: {
+            loja: true,
+            setor: true,
+        },
+    });
+
+    if (chamado.status == StatusChamado.CONCLUIDO) {
+     const historico = await fastify.prisma.historicoChamado.create({
+        data: {
+            respostaChamadoId: data.respostaChamadoId,
+            chamadoId: data.chamadoId,
+            lojaId: data.lojaId,
+            setorId: data.setorId,
+        },
+        includes: {
+            chamado: true,
+            loja: true,
+            setor: true,
+            responseChamado: true,
+        },
+    });
+        return historico;
+    }
 }
 
 export enum StatusChamado {
