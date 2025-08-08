@@ -42,3 +42,4 @@ export async function createChamado(
 
   return chamado;
 }
+
