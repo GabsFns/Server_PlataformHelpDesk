@@ -81,7 +81,7 @@ model Chamado {
   titulo       String
   descricao    String
   tipo         String
-  status       String
+  status       StatusChamado @default(ABERTO)
   prioridade   String
   dataCriacao  DateTime @default(now())
   dataConclusao DateTime?
@@ -138,9 +138,20 @@ model HistoricoChamado {
   setorId             Int
   tokenId             Int
 
+  dataRegistro DateTime @default(now())
+
   respostaChamado     RespostaChamado @relation(fields: [respostaChamadoId], references: [idRespostaChamado])
   chamado             Chamado         @relation(fields: [chamadoId], references: [idChamado])
   loja                Loja            @relation(fields: [lojaId], references: [idLoja])
   setor               Setor           @relation(fields: [setorId], references: [idSetor])
   token               Token           @relation(fields: [tokenId], references: [idToken])
+}
+
+enum StatusChamado {
+  ABERTO
+  EM_ATENDIMENTO
+  AGUARDANDO_RETORNO
+  RESOLVIDO
+  CONCLUIDO
+  CANCELADO
 }

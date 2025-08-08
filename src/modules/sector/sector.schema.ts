@@ -1,4 +1,15 @@
 import z from "zod";
+import id from "zod/v4/locales/id.cjs";
+
+export const historicoChamadoSchema = z.object({
+      idHistoricoChamado: z.number().int().positive("ID do histórico deve ser um número positivo"),
+      respostaChamadoId: z.number().int().positive("ID da resposta do chamado deve ser um número positivo"),
+      chamadoId: z.number().int().positive("ID do chamado deve ser um número positivo"),
+      lojaId: z.number().int().positive("ID da loja deve ser um número positivo"),
+      setorId: z.number().int().positive("ID do setor deve ser um número positivo"),
+      tokenId: z.number().int().positive("ID do token deve ser um número positivo"),
+
+})
 
 export const createRespostaSchema = z.object({
       mensagem: z.string().min(1, "Mensagem é obrigatória"),

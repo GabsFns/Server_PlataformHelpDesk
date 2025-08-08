@@ -2,6 +2,7 @@ import { FastifyRequest, FastifyReply, FastifyInstance } from "fastify";
 import { CreateRespostaSchema } from "./sector.schema";
 import { enviarRespostaParaFila } from "@/services/rabbitmqService";
 import { io } from "../../websocket/index";
+import { stat } from "fs";
 
 export async function responseChamado(fastify: FastifyInstance, data: CreateRespostaSchema) {
    const resposta = await fastify.prisma.$transaction(async (tx: any) => {
@@ -39,7 +40,7 @@ export async function responseChamado(fastify: FastifyInstance, data: CreateResp
      await fastify.prisma.chamado.update({
         where: { id: chamado.id },
         data: {
-            status: "FINALIZADO",
+            status: StatusChamado.EM_ATENDIMENTO,
             
         },
     });
@@ -60,4 +61,13 @@ export async function responseChamado(fastify: FastifyInstance, data: CreateResp
     io.to(routingKey).emit('novaResposta', resposta);
 
     return resposta;
+}
+
+export enum StatusChamado {
+    ABERTO = "ABERTO",
+    EM_ATENDIMENTO = "EM_ATENDIMENTO",
+    AGUARDANDO_RETORNO = "AGUARDANDO_RETORNO",
+    RESOLVIDO = "RESOLVIDO",
+    CONCLUIDO = "CONCLUIDO",
+    CANCELADO = "CANCELADO",
 }
